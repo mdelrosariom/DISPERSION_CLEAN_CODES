@@ -6,6 +6,7 @@ import numpy as np
 import math as math
 from simple_landscape import simple_landscape
 from adaptation import adapt 
+from niche_construction import niche_construction
 
 nrow = 20
 ncol = 20
@@ -14,21 +15,19 @@ main = ncol // 2
 shape = 0
 time_of_adaptation =5 #the adaptation will occur if the time step is multiple of this number
 current_time_step = 0
-niche_mainland = [1,2,3,4,5,6,7,8,9,10,11,12]
-sp_1 = ['sp_1']+ rnd.choices(["A", "T", "C", "G"], k= 100) 
-niche_of_sp1 =  rnd.randint(1,10)
-niche_sp_1 =  list(range(niche_of_sp1, niche_of_sp1+3))
 
-sp_2 = ['sp_2']+ rnd.choices(["A", "T", "C", "G"], k= 100) 
-niche_of_sp2 =  rnd.randint(1,10)
-niche_sp_2 =  list(range(niche_of_sp2, niche_of_sp2+3))
 
-species_list = [sp_1, sp_2]
+species_list= ["sp_1", "sp_2"]
 
 # time steps of the simulation
-max_time_steps = 10  # 
+max_time_steps = 10  
 
 
+niches = niche_construction([1,2], 10,5,3)
+niche_mainland = niches[0]
+niche_island =niches[1]
+niche_sp1 = niches[2]
+niche_sp2 = niches[3]
 
 mainland_island = simple_landscape(nrow, ncol, size, shape)
 
@@ -67,10 +66,10 @@ class Plant:
         self.specie = specie
         if specie == "sp_1": 
             self.color = 'forestgreen'
-            self.niche = niche_sp_1
+            self.niche = niche_sp1
         if specie == "sp_2": 
             self.color = 'blue'
-            self.niche = niche_sp_2
+            self.niche = niche_sp2
         self.comp_ab = rnd.random()
         
 
@@ -144,29 +143,25 @@ canvas = visual.canvas
 population = []
 
 # Create individuals only on the mainland
-for _ in range(50):
-    for specie in species_list: 
-        x = int(rnd.uniform(0, main)) #discrete mov
-        y = int(rnd.uniform(0, nrow)) #discrete mov
-        drawing = create_plant(x, y, initial_color='red')       
-        specie = species_list[species_list.index(specie)][0]
+for specie in species_list:
+    for _ in range(50):
+    
+        x = int(rnd.uniform(0, main))  # discrete mov
+        y = int(rnd.uniform(0, nrow))  # discrete mov
+        drawing = create_plant(x, y, initial_color='red')
         plant = Plant(x, y, drawing, specie)
-        
         population.append(plant)
 
 def update():
     global current_time_step
     global population  # Declare population as a global variable
    
-    plants_to_remove = []    
-        #offspring 
-   
+    plants_to_remove = []         #offspring    
 
     for x in range(len(population)): 
         plant = population[x]
         num_offspring = rnd.randint(1,4) #now the plant could produce more than 1 seed/ offspring, randomly 
-        for seed in range(num_offspring):
-        
+        for seed in range(num_offspring):        
            
             position = dispersal(plant) #for now its that parent
             if position != None: #this means, the seed did not end on the sea
