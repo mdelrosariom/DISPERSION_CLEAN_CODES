@@ -157,55 +157,37 @@ for _ in range(50):
 def update():
     global current_time_step
     global population  # Declare population as a global variable
-    neighbors = population[:]
+   
     plants_to_remove = []    
         #offspring 
-    pop_nei = population[:] #we made this list to find neighbors of plants
+   
 
     for x in range(len(population)): 
-        plant_obj = population[x]
-        if plant_obj.age > 1:  
-            wo_pl_ob = [x for x in pop_nei if x != plant_obj]
+        plant = population[x]
+        num_offspring = rnd.randint(1,4) #now the plant could produce more than 1 seed/ offspring, randomly 
+        for seed in range(num_offspring):
+        
+           
+            position = dispersal(plant) #for now its that parent
+            if position != None: #this means, the seed did not end on the sea
+                x_off = position[0]
+                y_off =position[1]                            
             
-            for plant_com in wo_pl_ob:
-                if plant_com.specie == plant_obj.specie:
-                    
-                    pos1 = plant_obj.pos
-                       
-                    pos2 = plant_com.pos
-                    
-                    vx = pos1[0]
-                    vy = pos1[1]
-                    nx = pos2[0]
-                    ny = pos2[1]
-                    if vx == nx-1 and vy == ny-1 or vx == nx-1 and vy ==ny or vx == nx-1 and vy == ny+1 \
-                    or vx == nx and vy == ny-1 or vx == nx and vy == ny+1 or vx == nx +1 and vy == ny-1 \
-                    or vx == nx+1 and vy == ny   or vx == nx+1 and vy == ny+1 :
-                        #parents can produce more than 1 seed
-                        num_offspring = rnd.randint(1,4) #now the plant could produce more than 1 seed/ offspring, randomly 
-                        for seed in range(num_offspring):
+            #position_off = dispersal(parent_pos)
+            
+            #if mainland_island[int(y_off), int(x_off)] != 0: #we already have that condition inside dispersal function
+            
+                drawing_off = create_plant(x_off, y_off, plant.color)
+                offspring = Plant(x_off, y_off, drawing_off, plant.specie)
+                #for now we chose one at random, after we can think on codominance
+               
+                if current_time_step%time_of_adaptation: #only adapt (shift its niche one place) each 100 time steps 
+                    if mainland_island[offspring.x][offspring.y] >1: #23 11 23 correction so occurs in future islands #== 2: #adaptation occur in islands
                         
-                            parent_disp = rnd.choice([plant_obj,plant_com])
-                            position = dispersal(parent_disp) #for now its that parent
-                            if position != None: #this means, the seed did not end on the sea
-                                x_off = position[0]
-                                y_off =position[1]                            
-                            
-                            #position_off = dispersal(parent_pos)
-                            
-                            #if mainland_island[int(y_off), int(x_off)] != 0: #we already have that condition inside dispersal function
-                            
-                                drawing_off = create_plant(x_off, y_off, plant_obj.color)
-                                offspring = Plant(x_off, y_off, drawing_off, plant_obj.specie)
-                                parent_disp_cap =rnd.choice([plant_obj, plant_com]) #for now we chose one at random, after we can think on codominance
-                                offspring.disp_cap = parent_disp_cap.disp_cap
-                                if current_time_step%time_of_adaptation: #only adapt (shift its niche one place) each 100 time steps 
-                                    if mainland_island[offspring.x][offspring.y] >1: #23 11 23 correction so occurs in future islands #== 2: #adaptation occur in islands
-                                        
-                                        offspring.niche = adapt(environmental_niche[offspring.x][offspring.y],plant_com.niche, "natural_selection", "yes")
-                                population.append(offspring)     
+                        offspring.niche = adapt(environmental_niche[offspring.x][offspring.y],plant.niche, "natural_selection", "yes")
+                population.append(offspring)     
                           
-            pop_nei.remove(plant_obj)  
+           
             
         #plants die after 1 years
     for plant in population:
