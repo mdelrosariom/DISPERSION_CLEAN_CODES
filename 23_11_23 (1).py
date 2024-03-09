@@ -4,12 +4,13 @@ import random as rnd
 import tkinter as tk
 import numpy as np
 import math as math
+#my functions 
+
 from simple_landscape import simple_landscape
 from adaptation import adapt 
 from niche_construction import niche_construction
-
-nrow = 20
-ncol = 20
+from niche_positioning import niche
+nrow = ncol = 20
 size = 1/4
 main = ncol // 2
 shape = 0
@@ -62,7 +63,7 @@ class Plant:
         self.drawing = drawing
         self.age = 0
         self.pos = [x,y]
-        self.disp_cap = rnd.randint(2,19) #for now random, after we can define diferent species based on this
+        self.disp_cap = rnd.randint(2,main) #for now random, after we can define diferent species based on this
         self.specie = specie
         if specie == "sp_1": 
             self.color = 'forestgreen'
@@ -83,35 +84,10 @@ def create_plant(x, y,initial_color):
         (x + radius) * visual.zoom, (y + radius) * visual.zoom,
         outline='black', 
         fill = initial_color
-        #fill='forestgreen'
-    )
+        )
 
-def niche(mainland_island):
-    '''
-  this will create other matrix that contains the values of the niche of all
-  the landscape. the niche is simply a list of numbers from 0 to 10 (for now)
-  the mainland contains all the niches (from 1 to 12). island will contain a subset 
-  of this niche. a list of lists with 2 or 2 subsets of the mainland. a species 
-  will have a "species niche" that is simply a list of 3 numbers (ascending order,
-  e.g [1 2 3]) if at least one of the numbers of the species niche is in the sequence 
-  of the island niche, then the specie can live there, otherwise, it cant  '''    
 
-    en_niche = np.zeros(mainland_island.shape)
-# Transform it into a list so you can replace the elements
-    en_niche = [[[item] for item in row] for row in en_niche] # need to transform it in lists because its 
-    niche_of_island =  rnd.randint(1,9)  #we need to define this now because if now it will produce 
-#one each time (in every coordinate of the island and we want the same )
-    for i in range(len(en_niche)):
-    
-        for j in range(len(en_niche)): 
-            if mainland_island[i][j] == 1:
-                en_niche[i][j] = niche_mainland #complete niches only 4 availables
-            if mainland_island[i][j] == 2:            
-                en_niche[i][j] = list(range(niche_of_island, niche_of_island+4)) # i am thinking of 
-  #larger than the niche i am thinking for species (len = 3)
-    return en_niche
-            
-environmental_niche = niche(mainland_island)   
+environmental_niche = niche(mainland_island, niche_island, niche_mainland)   
 
 
 def dispersal(indiv):
@@ -164,34 +140,23 @@ def update():
         for seed in range(num_offspring):        
            
             position = dispersal(plant) #for now its that parent
-            if position != None: #this means, the seed did not end on the sea
+            if position != None: 
                 x_off = position[0]
-                y_off =position[1]                            
-            
-            #position_off = dispersal(parent_pos)
-            
-            #if mainland_island[int(y_off), int(x_off)] != 0: #we already have that condition inside dispersal function
-            
+                y_off =position[1]                   
                 drawing_off = create_plant(x_off, y_off, plant.color)
                 offspring = Plant(x_off, y_off, drawing_off, plant.specie)
-                #for now we chose one at random, after we can think on codominance
-               
-                if current_time_step%time_of_adaptation: #only adapt (shift its niche one place) each 100 time steps 
+                possibility_of_adaptation = rnd.choice([1,2])
+                if possibility_of_adaptation ==2:               
                     if mainland_island[offspring.x][offspring.y] >1: #23 11 23 correction so occurs in future islands #== 2: #adaptation occur in islands
-                        
                         offspring.niche = adapt(environmental_niche[offspring.x][offspring.y],plant.niche, "natural_selection", "yes")
                 population.append(offspring)     
                           
-           
-            
-        #plants die after 1 years
+   
     for plant in population:
-        if plant.age >= 3:
+        if plant.age >= 1:
             canvas.delete(plant.drawing)
             plants_to_remove.append(plant)     
-            
-     
-    #to kill of the islands all the plants that dont have a compatible niche
+
     for plant in population: 
         if mainland_island[plant.x][plant.y] > 1:  # Only consider islands #this is in the case we build multiple islands in the future
             if not set(environmental_niche[plant.x][plant.y]) & set(plant.niche):
