@@ -124,24 +124,25 @@ population = []
 
 # Create individuals only on the mainland
 
-#def create_individuals_mainland(): 
-for specie in species_list:
-    for _ in range(20):
-        
-    
-        x = int(rnd.uniform(0, ncol//2))  # they get inizialized in the mainland 
-        y = int(rnd.uniform(0, nrow))  # discrete mov
-        drawing = create_plant(x, y, initial_color='red')            
-        plant = Plant(x, y, drawing, specie) 
-        
-        population.append(plant)
-  #  return (population)
+
+
 
 
 
 def update():
     global current_time_step
     global population  # Declare population as a global variable
+    for specie in species_list:
+        for _ in range(20):
+            
+        
+            x = int(rnd.uniform(0, ncol//2))  # they get inizialized in the mainland 
+            y = int(rnd.uniform(0, nrow))  # discrete mov
+            drawing = create_plant(x, y, initial_color='red')            
+            plant = Plant(x, y, drawing, specie) 
+            
+            population.append(plant)
+
     
    # create_individuals_mainland()
    
