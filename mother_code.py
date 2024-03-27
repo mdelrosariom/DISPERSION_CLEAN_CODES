@@ -130,17 +130,6 @@ visual = Visual(ncol, nrow)
 canvas = visual.canvas
 population = []
 
-def save_as_image(filename):
-    # Capture the screen of the Tkinter application
-    x = visual.winfo_rootx()
-    y = visual.winfo_rooty()
-    w = visual.winfo_width()
-    h = visual.winfo_height()
-    img = ImageGrab.grab(bbox=(x, y, x + w, y + h))
-
-    # Save the captured screen as an image
-    img.save(filename)
-
 
 def update():
       
@@ -160,7 +149,8 @@ def update():
    # create_individuals_mainland()
    
     plants_to_remove = []         #offspring    
-
+    max_time_steps = 10
+        
     for x in range(len(population)): 
         
         plant = population[x]
