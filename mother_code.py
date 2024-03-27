@@ -4,19 +4,23 @@ import random as rnd
 import tkinter as tk
 import numpy as np
 import math as math
+from PIL import ImageGrab #to take snaps of the tk 
+
 
 #my functions 
 from simple_landscape import simple_landscape
+from landscape_fixed_insolation_area import landscape_fixed_insolation_area
 from adaptation import adapt 
 from niche_construction import niche_construction
 from niche_positioning import niche
 from comp import competence
 from list_of_species import list_of_species
 from species_colors import color_species
+from species_disp import dispersion_species
 #GLOBAL VARIABLES RELATED TO LANDSCAPE 
 
 
-nrow = ncol = 20
+nrow = ncol = 50
 size = 1/4
 main = ncol // 2
 shape = 0
@@ -26,7 +30,7 @@ current_time_step = 0
 species_list = list_of_species(10)
 species_colors = color_species(species_list)
 # time steps of the simulation
-max_time_steps = 15  
+max_time_steps = 1000 
 
 
 niches = niche_construction(species_list, 10,5,3)
@@ -38,13 +42,13 @@ for i in range(2, len(niches)):
     name_of_species = "niche_sp" + str(sp_num)
     globals()[name_of_species] = niches[i]
 
-
-
-mainland_island = simple_landscape(nrow, ncol, size, shape)
+species_dispersal = dispersion_species(species_list, main)
+#mainland_island = simple_landscape(nrow, ncol, size, shape)
+mainland_island = landscape_fixed_insolation_area(nrow, ncol, size, shape, 'medium')
 species_list_stable = species_list[:]
 species_colors_dict = dict(zip(species_list_stable, species_colors))
 species_niches_dict = dict(zip(species_list_stable, niches))
-
+species_disp_dict = dict(zip(species_list_stable, species_dispersal))
 
 class Visual:
     def __init__(self, max_x, max_y):
@@ -69,9 +73,6 @@ class Visual:
                 self.squares[x, y] = self.canvas.create_rectangle(
                     x * self.zoom, y * self.zoom, (x + 1) * self.zoom, (y + 1) * self.zoom,
                     outline='black', fill=fill_color )
-
-
-
 class Plant:
     def __init__(self, x, y, drawing, species):
         self.x = x
@@ -79,17 +80,10 @@ class Plant:
         self.drawing = drawing
         self.age = 0
         self.pos = [x, y]
-        self.disp_cap = rnd.randint(2, main)  # Assuming 'main' is defined somewhere
-        #print("this is the specie", species)
-       # print("this is the specie", species)
-        
+        self.disp_cap = species_disp_dict.get(species)          
         self.color = species_colors_dict.get(species)
         self.niche = species_niches_dict.get(species)
         self.species = species            
-        
-       
-        self.niche = [1,2,3]
-      
                          
             
 def create_plant(x, y,initial_color):
@@ -136,10 +130,20 @@ visual = Visual(ncol, nrow)
 canvas = visual.canvas
 population = []
 
-# Create individuals only on the mainland
+def save_as_image(filename):
+    # Capture the screen of the Tkinter application
+    x = visual.winfo_rootx()
+    y = visual.winfo_rooty()
+    w = visual.winfo_width()
+    h = visual.winfo_height()
+    img = ImageGrab.grab(bbox=(x, y, x + w, y + h))
+
+    # Save the captured screen as an image
+    img.save(filename)
 
 
 def update():
+      
     global current_time_step
     global population  # Declare population as a global variable
     #for specie in species_list:
@@ -199,7 +203,7 @@ def update():
        
         plant.age += 1
      
-   # print(len(population))
+    print(len(population))
     current_time_step += 1
     if current_time_step < max_time_steps:
         # Schedule the next update with an interval
