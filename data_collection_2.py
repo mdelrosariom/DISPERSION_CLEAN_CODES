@@ -79,7 +79,7 @@ def data_2(population, mainland_island, niche_island, current_time_step, timeste
     numbers_list = list(range(1,timesteps+1))
     
     beggining = numbers_list[:int(timesteps*0.1)]
-    print("START",beggining)
+  
     end = numbers_list[int(0.9 *timesteps):]       
      
     if current_time_step in beggining:     
@@ -116,10 +116,10 @@ def data_2(population, mainland_island, niche_island, current_time_step, timeste
                     "niche_sp_island_start": [no_sp_is_be], 
                     "niche_sp_mainland_end": [no_sp_ml_end], 
                     "niche_sp_island_end": [no_sp_is_end]}
-    print(data_dict_2)
+   
     data_df_2 = pd.DataFrame(data_dict_2)
 
-    print("estooo", data_df_2)
+   
     
     if current_time_step in beggining:
         data_df_2.to_excel("C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp/Data_2_BEGGINING"+ str(current_time_step)+ ".xlsx", index=False)
