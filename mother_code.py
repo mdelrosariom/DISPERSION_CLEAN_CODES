@@ -166,7 +166,7 @@ def update():
     for x in range(len(population)): 
         
         plant = population[x]
-        num_offspring = rnd.randint(1,4) #now the plant could produce more than 1 seed/ offspring, randomly 
+        num_offspring = rnd.randint(1,2) #now the plant could produce more than 1 seed/ offspring, randomly 
         if plant.age>1: 
             for seed in range(num_offspring):        
                
@@ -193,10 +193,41 @@ def update():
                 canvas.delete(plant.drawing)
                 plants_to_remove.append(plant)
             
-    plants_to_remove = competence(population, environmental_niche, plants_to_remove)
-   
-                    
+    plants_to_remove = competence(population, environmental_niche, plants_to_remove)   
+  
+   # Carrying capacity section
+    plants_in_continent = []
+    for contp in population: 
+       if mainland_island[contp.x][contp.y] ==1 :
+           plants_in_continent.append(contp)   
+    to_conserve = {}
+    to_discard = []
+    
+    # Iterate over each species in the species list
+    for species in species_list:
+        individuals = [plant for plant in population if plant.species == species and mainland_island[plant.x][plant.y] == 1]
+
+        if individuals:
+            num_to_conserve = int(0.2 * len(plants_in_continent))
+            if len(individuals) > num_to_conserve:
+                to_conserve[species] = rnd.sample(individuals, num_to_conserve)
+                to_discard.extend([plant for plant in individuals if plant not in to_conserve[species]])
+    
+    # Remove plants to discard from population
+    for plants_to_discard in to_discard:
+        plants_to_remove.append(plants_to_discard)
+    
     population = [plant for plant in population if plant not in plants_to_remove]
+    
+    # Remove excess individuals from to_conserve
+    for species, individuals_to_conserve in to_conserve.items():
+        excess = len(individuals_to_conserve) - int(0.4 * len(population))
+        if excess > 0:
+            to_discard.extend(individuals_to_conserve[:excess])
+    
+    # Remove excess individuals from population
+    population = [plant for plant in population if plant not in to_discard]
+
 
     for plant in plants_to_remove:
         canvas.delete(plant.drawing)
@@ -212,7 +243,7 @@ def update():
 
     if current_time_step % 100 == 0:
 
-       data(population, mainland_island, environmental_niche, "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp/datos_1" + str(current_time_step) + ".xlsx")
+       data(population, mainland_island, environmental_niche, "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp/datos_1_SIM_5_PER_REP1" + str(current_time_step)+  ".xlsx")
 
     data_2(population, mainland_island, niche_island, current_time_step, max_time_steps)
 
