@@ -30,10 +30,10 @@ current_time_step = 1
 species_list = list_of_species(20)
 species_colors = color_species(species_list)
 # time steps of the simulation
-max_time_steps = 1001 
+max_time_steps = 1001
 
 
-niches = niche_construction(species_list, 1000,500,100)
+niches = niche_construction(species_list, 1000,250,25)
 niche_mainland = niches[0]
 niche_island = niches[1]
 #to create niches for all of the plants
@@ -120,8 +120,8 @@ def dispersal(indiv):
     dx = dispersal_x*direction
     direction = rnd.choice([-1, 1])
     dy = dispersal_y*direction    
-    x_new = int((indiv.x + dx) % nrow) #%nrow module to wrap up the world 
-    y_new = int((indiv.y + dy) % ncol) #%nrow module to wrap up the world 
+    x_new = int((indiv.x + dx) % ncol) #%nrow module to wrap up the world 
+    y_new = int((indiv.y + dy) % nrow) #%nrow module to wrap up the world 
 
     if mainland_island[int(y_new), int(x_new)] != 0:
         canvas.coords(indiv.drawing, (x_new - 0.5) * visual.zoom, (y_new - 0.5) * visual.zoom,
@@ -196,10 +196,7 @@ def update():
     plants_to_remove = competence(population, environmental_niche, plants_to_remove)   
   
    # Carrying capacity section
-    plants_in_continent = []
-    for contp in population: 
-       if mainland_island[contp.x][contp.y] ==1 :
-           plants_in_continent.append(contp)   
+     
     to_conserve = {}
     to_discard = []
     
@@ -208,7 +205,7 @@ def update():
         individuals = [plant for plant in population if plant.species == species and mainland_island[plant.x][plant.y] == 1]
 
         if individuals:
-            num_to_conserve = int(0.2 * len(plants_in_continent))
+            num_to_conserve = int(0.2 * len(population))
             if len(individuals) > num_to_conserve:
                 to_conserve[species] = rnd.sample(individuals, num_to_conserve)
                 to_discard.extend([plant for plant in individuals if plant not in to_conserve[species]])
@@ -243,7 +240,7 @@ def update():
 
     if current_time_step % 100 == 0:
 
-       data(population, mainland_island, environmental_niche, "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp/datos_1_SIM_5_PER_REP1" + str(current_time_step)+  ".xlsx")
+       data(population, mainland_island, environmental_niche, "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp_3/datos_1_SIM_25_PER_REP5" + str(current_time_step)+  ".xlsx", "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp_3/datos_1_SIM_25_PER_REP5_IDENTITY_SP" + str(current_time_step)+  ".xlsx", niche_island)
 
     data_2(population, mainland_island, niche_island, current_time_step, max_time_steps)
 
