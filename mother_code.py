@@ -120,8 +120,8 @@ def dispersal(indiv):
     dx = dispersal_x*direction
     direction = rnd.choice([-1, 1])
     dy = dispersal_y*direction    
-    x_new = int((indiv.x + dx) % ncol) #%nrow module to wrap up the world 
-    y_new = int((indiv.y + dy) % nrow) #%nrow module to wrap up the world 
+    x_new = int((indiv.x + dx) ) #%nrow module to wrap up the world 
+    y_new = int((indiv.y + dy)% ncol) #%nrow module to wrap up the world 
 
     if mainland_island[int(y_new), int(x_new)] != 0:
         canvas.coords(indiv.drawing, (x_new - 0.5) * visual.zoom, (y_new - 0.5) * visual.zoom,
@@ -174,13 +174,16 @@ def update():
                 if position != None: 
                     x_off = position[0]
                     y_off =position[1] 
-                    drawing_off = create_plant(x_off, y_off, plant.color)
-                    offspring = Plant(x_off, y_off, drawing_off, plant.species)
-                    possibility_of_adaptation = rnd.choice([1,2])
-                    if possibility_of_adaptation ==2:               
-                        if mainland_island[offspring.x][offspring.y] >1: #23 11 23 correction so occurs in future islands #== 2: #adaptation occur in islands
-                            offspring.niche = adapt(environmental_niche[offspring.x][offspring.y],plant.niche, "natural_selection", "yes")
-                    population.append(offspring)     
+                    if x_off <0 or x_off> ncol: #this is because we took of the round wold in the y 
+                        continue
+                    else:
+                        drawing_off = create_plant(x_off, y_off, plant.color)
+                        offspring = Plant(x_off, y_off, drawing_off, plant.species)
+                        possibility_of_adaptation = rnd.choice([1,2])
+                        if possibility_of_adaptation ==2:               
+                            if mainland_island[offspring.x][offspring.y] >1: #23 11 23 correction so occurs in future islands #== 2: #adaptation occur in islands
+                                offspring.niche = adapt(environmental_niche[offspring.x][offspring.y],plant.niche, "natural_selection", "yes")
+                        population.append(offspring)     
     
             if plant.age >= 1:
                 canvas.delete(plant.drawing)
