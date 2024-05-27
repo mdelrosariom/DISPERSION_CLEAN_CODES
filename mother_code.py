@@ -12,7 +12,7 @@ import time
 from simple_landscape import simple_landscape
 from landscape_fixed_insolation_area import landscape_fixed_insolation_area
 from adaptation import adapt 
-from niche_construction import niche_construction
+from niche_construction_2 import niche_construction2
 from niche_positioning import niche
 from comp import competence
 from list_of_species import list_of_species
@@ -33,7 +33,7 @@ species_colors = color_species(species_list)
 max_time_steps = 1001
 
 
-niches = niche_construction(species_list, 1000,250,25)
+niches = niche_construction2(species_list, 1000,250,25,10)
 niche_mainland = niches[0]
 niche_island = niches[1]
 #to create niches for all of the plants
