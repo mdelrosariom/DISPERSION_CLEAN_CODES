@@ -22,8 +22,8 @@ from data_collection_2 import data, data_2
 
 #GLOBAL VARIABLES RELATED TO LANDSCAPE 
 
-nrow = ncol = 140
-size = 1/4
+nrow = ncol = 100
+size = 1/8
 main = ncol // 2
 shape = 0
 current_time_step = 1
@@ -120,7 +120,7 @@ def dispersal(indiv):
     dx = dispersal_x*direction
     direction = rnd.choice([-1, 1])
     dy = dispersal_y*direction    
-    x_new = int((indiv.x + dx) ) #%nrow module to wrap up the world 
+    x_new = int((indiv.x + dx)% ncol ) #%nrow module to wrap up the world 
     y_new = int((indiv.y + dy)% ncol) #%nrow module to wrap up the world 
 
     if mainland_island[int(y_new), int(x_new)] != 0:
@@ -151,18 +151,22 @@ def update():
     for i in species_list:        
         for _ in range(2):        
             x = int(rnd.uniform(0, ncol//2))  # they get inizialized in the mainland 
-            y = int(rnd.uniform(0, nrow))  # discrete mov
-            drawing = create_plant(x, y, initial_color='red')        
+            if 0 > x or x > ncol: 
+                continue
+            else:           
+                y = int(rnd.uniform(0, nrow))  # discrete mov
+                drawing = create_plant(x, y, initial_color='red')                 
            
-            plant = Plant(x, y, drawing, i)             
-            population.append(plant)
+                plant = Plant(x, y, drawing, i)                       
+            
+                population.append(plant)
 
     
    # create_individuals_mainland()
     update_time_step_label(current_time_step)
     plants_to_remove = []         #offspring    
     
-        
+   ##########33     
     for x in range(len(population)): 
         
         plant = population[x]
@@ -197,40 +201,47 @@ def update():
                 plants_to_remove.append(plant)
             
     plants_to_remove = competence(population, environmental_niche, plants_to_remove)   
-  
-   # Carrying capacity section
-     
-    to_conserve = {}
-    to_discard = []
-    
-    # Iterate over each species in the species list
-    for species in species_list:
-        individuals = [plant for plant in population if plant.species == species and mainland_island[plant.x][plant.y] == 1]
-
-        if individuals:
-            num_to_conserve = int(0.2 * len(population))
-            if len(individuals) > num_to_conserve:
-                to_conserve[species] = rnd.sample(individuals, num_to_conserve)
-                to_discard.extend([plant for plant in individuals if plant not in to_conserve[species]])
-    
-    # Remove plants to discard from population
-    for plants_to_discard in to_discard:
-        plants_to_remove.append(plants_to_discard)
-    
-    population = [plant for plant in population if plant not in plants_to_remove]
-    
-    # Remove excess individuals from to_conserve
-    for species, individuals_to_conserve in to_conserve.items():
-        excess = len(individuals_to_conserve) - int(0.4 * len(population))
-        if excess > 0:
-            to_discard.extend(individuals_to_conserve[:excess])
-    
-    # Remove excess individuals from population
-    population = [plant for plant in population if plant not in to_discard]
+   #----------------------------------------------------------------------------
+# =============================================================================
+#    #TURNOVER SECTION    
+#      
+#     to_kill = []
+#      
+#     for i in range(nrow): 
+#         for j in range(ncol//2):
+#             ctk = [i,j]
+#             to_kill.append(ctk)   
+#    
+#     tc =  int(len(to_kill)*0.6)
+#     target_cor = rnd.sample(to_kill,tc )                    
+#      
+#     to_remplace = []
+#      
+#     for PLANT in population: 
+#         if PLANT.pos in target_cor:
+#             plants_to_remove.append(PLANT)   
+#             
+#             to_remplace.append(PLANT.pos)           
+#      
+#     for to_re in to_remplace: 
+#         species = rnd.choice(species_list)    
+#         x = to_re[0]
+#         y = to_re[1]
+#         drawing = create_plant(x, y, initial_color='red')        
+#        
+#         re_plant = Plant(x, y, drawing, species)       
+#         
+#         population.append(re_plant)
+# =============================================================================
+   
+   
 
 
     for plant in plants_to_remove:
         canvas.delete(plant.drawing)
+        if plant in population:
+            population.remove(plant)
+        
 
     for plant in population:
        
