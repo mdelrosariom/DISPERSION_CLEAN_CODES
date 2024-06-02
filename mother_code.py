@@ -23,8 +23,10 @@ from data_collection_2 import data, data_2
 #GLOBAL VARIABLES RELATED TO LANDSCAPE 
 
 nrow = ncol = 100
-size = 1/8
-main = ncol // 2
+#nrow = 100
+#ncol = 200
+size = 1/2
+main = ncol // 3
 shape = 0
 current_time_step = 1
 species_list = list_of_species(20)
@@ -33,7 +35,7 @@ species_colors = color_species(species_list)
 max_time_steps = 1001
 
 
-niches = niche_construction2(species_list, 1000,250,25,10)
+niches = niche_construction2(species_list, 1000,250,25,50) #PER!!!!!!!!!!!!!!!
 niche_mainland = niches[0]
 niche_island = niches[1]
 #to create niches for all of the plants
@@ -113,8 +115,8 @@ def dispersal(indiv):
        
  #I will use the gaussian for dispersal because its simple and commonly used in dispersal 
  #studies 
-    dispersal_x = np.random.normal(indiv.disp_cap, 1) #standar derivation common 1 
-    dispersal_y = np.random.normal(indiv.disp_cap, 1)    
+    dispersal_x = np.random.normal(indiv.disp_cap, indiv.disp_cap//3) #standar derivation common 1 
+    dispersal_y = np.random.normal(indiv.disp_cap, indiv.disp_cap//3)    
     #a chunck so the seed can be dispersed also to left and down
     direction = rnd.choice([-1, 1])
     dx = dispersal_x*direction
@@ -143,6 +145,8 @@ def stop_clock(num_steps, current_time_step, pause_time):
         time.sleep(pause_time)
          
 def update():
+    per = 50 
+    rep = 5
           
     global current_time_step
     global population  # Declare population as a global variable
@@ -150,7 +154,7 @@ def update():
     stop_clock([50, 100, 150, 200,800,850,900,950], current_time_step, 5)
     for i in species_list:        
         for _ in range(2):        
-            x = int(rnd.uniform(0, ncol//2))  # they get inizialized in the mainland 
+            x = int(rnd.uniform(0, main))  # they get inizialized in the mainland 
             if 0 > x or x > ncol: 
                 continue
             else:           
@@ -200,43 +204,47 @@ def update():
                 canvas.delete(plant.drawing)
                 plants_to_remove.append(plant)
             
-    plants_to_remove = competence(population, environmental_niche, plants_to_remove)   
+    competence(population, environmental_niche, plants_to_remove)   
    #----------------------------------------------------------------------------
 # =============================================================================
-#    #TURNOVER SECTION    
-#      
-#     to_kill = []
-#      
-#     for i in range(nrow): 
-#         for j in range(ncol//2):
-#             ctk = [i,j]
-#             to_kill.append(ctk)   
-#    
-#     tc =  int(len(to_kill)*0.6)
-#     target_cor = rnd.sample(to_kill,tc )                    
-#      
-#     to_remplace = []
-#      
-#     for PLANT in population: 
-#         if PLANT.pos in target_cor:
-#             plants_to_remove.append(PLANT)   
-#             
-#             to_remplace.append(PLANT.pos)           
-#      
-#     for to_re in to_remplace: 
-#         species = rnd.choice(species_list)    
-#         x = to_re[0]
-#         y = to_re[1]
-#         drawing = create_plant(x, y, initial_color='red')        
-#        
-#         re_plant = Plant(x, y, drawing, species)       
-#         
-#         population.append(re_plant)
-# =============================================================================
-   
-   
+#    #KILL RANDOM MAINLAND SECTION    
+
+    to_kill = []
+          
+    for i in range(nrow): 
+        for j in range(ncol // 2):
+            ctk = [j, i]
+            to_kill.append(ctk)   
+        
+    tc = int(len(to_kill) * 0.2)
+    target_cor = rnd.sample(to_kill, tc)                    
+          
+    to_remplace = []
+          
+    for plant in population: 
+        if plant.pos in target_cor:
+            plants_to_remove.append(plant)   
+            to_remplace.append(plant.pos)           
+    
+    for to_re in to_remplace: 
+        species = rnd.choice(species_list)    
+        x = to_re[0]
+        y = to_re[1]
+          
+       
+       # re_plant = Plant(x, y)       
+        #population.append(re_plant)
+    
 
 
+
+
+
+
+
+#      
+#   # =============================================================================
+   
     for plant in plants_to_remove:
         canvas.delete(plant.drawing)
         if plant in population:
@@ -254,9 +262,9 @@ def update():
 
     if current_time_step % 100 == 0:
 
-       data(population, mainland_island, environmental_niche, "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp_3/datos_1_SIM_25_PER_REP5" + str(current_time_step)+  ".xlsx", "C:/Users/mdrmi/OneDrive/Escritorio/data_simus_disp_3/datos_1_SIM_25_PER_REP5_IDENTITY_SP" + str(current_time_step)+  ".xlsx", niche_island)
+       data(population, mainland_island, environmental_niche, current_time_step,per, rep, niche_island)
 
-    data_2(population, mainland_island, niche_island, current_time_step, max_time_steps)
+    data_2(population, mainland_island, niche_island, current_time_step, max_time_steps,per,rep)
 
     current_time_step += 1
     
