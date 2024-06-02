@@ -10,7 +10,7 @@ import time
 
 #my functions 
 from simple_landscape import simple_landscape
-from landscape_fixed_insolation_area import landscape_fixed_insolation_area
+from ok_landscape_fixed_insolation_area import landscape_fixed_insolation_area
 from adaptation import adapt 
 from niche_construction_2 import niche_construction2
 from niche_positioning import niche
@@ -27,6 +27,7 @@ nrow = ncol = 100
 #ncol = 200
 size = 1/2
 main = ncol // 3
+
 shape = 0
 current_time_step = 1
 species_list = list_of_species(20)
@@ -45,8 +46,8 @@ for i in range(2, len(niches)):
     globals()[name_of_species] = niches[i]
 
 species_dispersal = dispersion_species(species_list, main)
-#mainland_island = simple_landscape(nrow, ncol, size, shape)
-mainland_island = landscape_fixed_insolation_area(nrow, ncol, size, shape, 'medium')
+
+mainland_island = landscape_fixed_insolation_area(nrow, ncol, size, shape, 'far', main)
 species_list_stable = species_list[:]
 species_colors_dict = dict(zip(species_list_stable, species_colors))
 species_niches_dict = dict(zip(species_list_stable, niches))
@@ -112,28 +113,29 @@ environmental_niche = niche(mainland_island, niche_island, niche_mainland)
 
 
 def dispersal(indiv):
-       
- #I will use the gaussian for dispersal because its simple and commonly used in dispersal 
- #studies 
-    dispersal_x = np.random.normal(indiv.disp_cap, indiv.disp_cap//3) #standar derivation common 1 
-    dispersal_y = np.random.normal(indiv.disp_cap, indiv.disp_cap//3)    
-    #a chunck so the seed can be dispersed also to left and down
+    # Gaussian for dispersal with standard deviation
+    dispersal_x = np.random.normal(indiv.disp_cap, indiv.disp_cap // 3)
+    dispersal_y = np.random.normal(indiv.disp_cap, indiv.disp_cap // 3)
+    
+    # Random direction for x and y
     direction = rnd.choice([-1, 1])
-    dx = dispersal_x*direction
+    dx = dispersal_x * direction
     direction = rnd.choice([-1, 1])
-    dy = dispersal_y*direction    
-    x_new = int((indiv.x + dx)% ncol ) #%nrow module to wrap up the world 
-    y_new = int((indiv.y + dy)% ncol) #%nrow module to wrap up the world 
+    dy = dispersal_y * direction
+    
+    # Ensure the new position wraps around vertically but not horizontally
+    x_new = int(indiv.x + dx)
+    y_new = int((indiv.y + dy) % nrow)  # Wrap around vertically
 
-    if mainland_island[int(y_new), int(x_new)] != 0:
-        canvas.coords(indiv.drawing, (x_new - 0.5) * visual.zoom, (y_new - 0.5) * visual.zoom,
-                      (x_new + 0.5) * visual.zoom, (y_new + 0.5) * visual.zoom)
-        indiv.x = x_new
-        indiv.y = y_new       
+    if 0 <= x_new < ncol:  # Check horizontal boundaries
+        if mainland_island[y_new, x_new] != 0:
+            canvas.coords(indiv.drawing, (x_new - 0.5) * visual.zoom, (y_new - 0.5) * visual.zoom,
+                          (x_new + 0.5) * visual.zoom, (y_new + 0.5) * visual.zoom)
+            indiv.x = x_new
+            indiv.y = y_new
+            return [indiv.x, indiv.y]
+    return None
 
-        return ([indiv.x, indiv.y])
-    else: 
-        pass
 
 visual = Visual(ncol, nrow)
 canvas = visual.canvas
@@ -151,18 +153,15 @@ def update():
     global current_time_step
     global population  # Declare population as a global variable
     #for specie in species_list:
-    stop_clock([50, 100, 150, 200,800,850,900,950], current_time_step, 5)
+    #stop_clock([50, 100, 150, 200,800,850,900,950], current_time_step, 5)
     for i in species_list:        
         for _ in range(2):        
             x = int(rnd.uniform(0, main))  # they get inizialized in the mainland 
-            if 0 > x or x > ncol: 
-                continue
-            else:           
-                y = int(rnd.uniform(0, nrow))  # discrete mov
-                drawing = create_plant(x, y, initial_color='red')                 
-           
-                plant = Plant(x, y, drawing, i)                       
-            
+             
+            if 0 <= x < ncol:
+                y = int(rnd.uniform(0, nrow))  # discrete move
+                drawing = create_plant(x, y, initial_color='red')
+                plant = Plant(x, y, drawing, i)
                 population.append(plant)
 
     
@@ -174,7 +173,7 @@ def update():
     for x in range(len(population)): 
         
         plant = population[x]
-        num_offspring = rnd.randint(1,2) #now the plant could produce more than 1 seed/ offspring, randomly 
+        num_offspring = rnd.randint(1,3) #now the plant could produce more than 1 seed/ offspring, randomly 
         if plant.age>1: 
             for seed in range(num_offspring):        
                
