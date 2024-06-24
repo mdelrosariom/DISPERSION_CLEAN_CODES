@@ -262,7 +262,7 @@ def update():
     
     # Data collection chunk
 
-    if current_time_step % 100 == 0:
+    if current_time_step % 10 == 0:
 
        data(population, mainland_island, environmental_niche, current_time_step,per, rep, niche_island)
 
