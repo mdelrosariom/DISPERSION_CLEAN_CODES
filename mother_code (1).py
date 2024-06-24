@@ -25,18 +25,19 @@ from data_collection_2 import data, data_2
 nrow = ncol = 100
 #nrow = 100
 #ncol = 200
-size = 1/2
+size = 1/3
 main = ncol // 3
 
 shape = 0
-current_time_step = 1
+current_time_step = 0
 species_list = list_of_species(20)
 species_colors = color_species(species_list)
 # time steps of the simulation
-max_time_steps = 1001
+max_time_steps = 0
 
-
-niches = niche_construction2(species_list, 1000,250,25,50) #PER!!!!!!!!!!!!!!!
+per =  50 
+rep = 5
+niches = niche_construction2(species_list, 1000,250,25,per) #PER!!!!!!!!!!!!!!!
 niche_mainland = niches[0]
 niche_island = niches[1]
 #to create niches for all of the plants
@@ -47,7 +48,7 @@ for i in range(2, len(niches)):
 
 species_dispersal = dispersion_species(species_list, main)
 
-mainland_island = landscape_fixed_insolation_area(nrow, ncol, size, shape, 'far', main)
+mainland_island = landscape_fixed_insolation_area(nrow, ncol, size, shape, 'medium', main)
 species_list_stable = species_list[:]
 species_colors_dict = dict(zip(species_list_stable, species_colors))
 species_niches_dict = dict(zip(species_list_stable, niches))
@@ -154,8 +155,7 @@ def stop_clock(num_steps, current_time_step, pause_time):
         time.sleep(pause_time)
          
 def update():
-    per = 50 
-    rep = 5
+    
           
     global current_time_step
     global population  # Declare population as a global variable
@@ -180,7 +180,7 @@ def update():
     for x in range(len(population)): 
         
         plant = population[x]
-        num_offspring = rnd.randint(1,3) #now the plant could produce more than 1 seed/ offspring, randomly 
+        num_offspring = rnd.randint(1,2) #now the plant could produce more than 1 seed/ offspring, randomly 
         if plant.age>1: 
             for seed in range(num_offspring):     
                 where = rnd.randint(1, 2)
@@ -242,11 +242,6 @@ def update():
        # re_plant = Plant(x, y)       
         #population.append(re_plant)
     
-
-
-
-
-
 
 
 #      
