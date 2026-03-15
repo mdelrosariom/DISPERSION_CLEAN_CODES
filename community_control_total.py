@@ -8,12 +8,12 @@ import random as rnd
 
 def community_control(community, nrow, ncol): 
     '''
-    controls the number of individuals in mainland so it doesnt get full too quickly.
-    allows 60% of mainland to be occupied. 
+    controls the number of individuals in all of the world (not just mainland) so it doesnt get full too quickly.
+    allows 60% of world to be occupied. 
     
     community : the list of plants in community.
     nrow : dimentions of mainland. one number
-    main : dimentions of mainland. one number
+    ncol : dimentions of column. one number
     Returns : list of individuals to eliminate
     '''
     
@@ -25,11 +25,11 @@ def community_control(community, nrow, ncol):
     
     for plant in community: 
         # if the plant is in the mainland will have the y coordinate
-        # of its position in the mainland
+        # of its position in the mainland not active here, active in community_control.py
         #if plant.pos[0] < main: #so in mainland, x coordinate of sps. 
         individuals_world.append(plant)
     #more individuals than allowed
-    if len(individuals_mainland) > max_num_in_world: 
+    if len(individuals_world) > max_num_in_world: 
         # avoid bias
         ##rnd.shuffle(individuals_mainland) this is not necesary because rnd.sample is already aleatory 
         # sample instead to avoid duplicates — sample instead of choices

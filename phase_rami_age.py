@@ -23,10 +23,10 @@ os.chdir("C:/Users/mdrmi/OneDrive/Escritorio/ABM_PHASES_SIMU")
 from corrected_landscape_fixed_insolation_area import landscape_fixed_insolation_area #efficient
 from fast_data_collection_2_phase_0 import data_fast_append ### can be faster
 from fast_competition_phase_RAMI_VERSION import competition ##can be faster #fixed
-from community_control import community_control #efficient
+from community_control_total import community_control #efficient
 from list_of_species import list_of_species #efficient
 from sps_niche_phase_RAMI_VERSION import species_niche #efficient
-from environmental_niche_50_per_RAMI_VERSION import  niche_construction #efficient enough
+from environmental_niche_10_per_RAMI_VERSION import  niche_construction #efficient enough
    
 
 def dispersal(indiv, nrow, mainland_island): #efficient enough
@@ -193,7 +193,7 @@ def update(nrow,  main, species_list, max_time_steps, rep, mainland_island, reso
         #-----------competition chunk
         plants_down_for_competition = competition(community,resources_environment, mainland_island, ques)  #(community,plants_to_remove,resources_environment, mainland_island, ques)  
         #adding plants lost for competition to list to eliminate 
-        #print("CHUPAPIJA competition returned:", plants_down_for_competition)
+        
         plants_to_remove.extend(plants_down_for_competition[0])
         #----------------------------------------------------------------------------------------  
 
@@ -227,3 +227,4 @@ if __name__ == "__main__":
     type_sim = sys.argv[2]
     simulations(num_simus, type_sim)
 
+simulations(3, "50_per_10_annes")
